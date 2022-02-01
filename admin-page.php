@@ -82,6 +82,7 @@ function mailchimp_coupons_settings_page_html() {
     if ( isset( $_GET['settings-updated'] ) ) {
         // add settings saved message with the class of "updated"
         add_settings_error( 'mrc_messages', 'mrc_message', __( 'Settings Saved', 'mrc' ), 'updated' );
+        do_action('mailchimp_coupons_settings_updated');
     }
 
     // show error/update messages
