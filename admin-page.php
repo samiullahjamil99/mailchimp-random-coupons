@@ -23,17 +23,8 @@ function mrc_settings_init() {
         )
     );
 
-    $options = get_option('mrc_options');
-    $apikey = $options['mrc_field_apikey'];
-    if ($apikey):
-    $client = new MailchimpMarketing\ApiClient();
-    $client->setConfig([
-      'apiKey' => $apikey,
-      'server' => substr($apikey,strpos($apikey,'-')+1),
-    ]);
-
-    $response = $client->lists->getAllLists();
-    foreach($response->lists as $list):
+    $lists = MRC_API()->get_lists();
+    foreach($lists as $list):
     add_settings_field(
       'mrc_field_discount_amounts_'.$list->id,
       __('Discount Percentage for List: <br><u>'.$list->name.'</u>','mrc'),
@@ -45,7 +36,6 @@ function mrc_settings_init() {
       ),
     );
     endforeach;
-    endif;
 }
 
 add_action( 'admin_init', 'mrc_settings_init' );
@@ -92,6 +82,7 @@ function mailchimp_coupons_settings_page_html() {
     if ( isset( $_GET['settings-updated'] ) ) {
         // add settings saved message with the class of "updated"
         add_settings_error( 'mrc_messages', 'mrc_message', __( 'Settings Saved', 'mrc' ), 'updated' );
+        do_action('mailchimp_coupons_settings_updated');
     }
 
     // show error/update messages
