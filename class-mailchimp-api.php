@@ -36,4 +36,3 @@ class Mailchimp_API {
     return $webhooks;
   }
 }
-$GLOBALS['mailchimp_api'] = new Mailchimp_API();
