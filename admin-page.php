@@ -14,7 +14,7 @@ function mrc_settings_init() {
     add_settings_field(
         'mrc_field_apikey', // As of WP 4.6 this value is used only internally.
                                 // Use $args' label_for to populate the id inside the callback.
-            __( 'API Key', 'wporg' ),
+            __( 'API Key', 'mrc' ),
         'mrc_field_apikey_cb',
         'mrc',
         'mrc_section_mailchimp',
@@ -22,6 +22,30 @@ function mrc_settings_init() {
             'label_for'         => 'mrc_field_apikey',
         )
     );
+
+    $options = get_option('mrc_options');
+    $apikey = $options['mrc_field_apikey'];
+    if ($apikey):
+    $client = new MailchimpMarketing\ApiClient();
+    $client->setConfig([
+      'apiKey' => $apikey,
+      'server' => substr($apikey,strpos($apikey,'-')+1),
+    ]);
+
+    $response = $client->lists->getAllLists();
+    foreach($response->lists as $list):
+    add_settings_field(
+      'mrc_field_discount_amounts_'.$list->id,
+      __('Discount Percentage for List: <br><u>'.$list->name.'</u>','mrc'),
+      'mrc_fields_discount_amounts_cb',
+      'mrc',
+      'mrc_section_mailchimp',
+      array(
+        'label_for' => 'list_'.$list->id,
+      ),
+    );
+    endforeach;
+    endif;
 }
 
 add_action( 'admin_init', 'mrc_settings_init' );
@@ -38,6 +62,13 @@ function mrc_field_apikey_cb( $args ) {
     ?>
     <input type="password" id="<?php echo esc_attr( $args['label_for'] ); ?>" name="mrc_options[<?php echo esc_attr( $args['label_for'] ); ?>]" value="<?php echo $options[$args['label_for']]; ?>">
     <?php
+}
+
+function mrc_fields_discount_amounts_cb($args) {
+  $options = get_option( 'mrc_options' );
+  ?>
+  <input type="number" min="0" max="100" id="<?php echo esc_attr( $args['label_for'] ); ?>" name="mrc_options[<?php echo esc_attr( $args['label_for'] ); ?>]" value="<?php echo $options[$args['label_for']]; ?>">
+  <?php
 }
 
 function mailchimp_coupons_settings_page() {
