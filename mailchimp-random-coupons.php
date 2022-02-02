@@ -23,6 +23,7 @@ function MRC_API() {
 $GLOBALS['mailchimp_api'] = MRC_API();
 
 add_action('mailchimp_coupons_settings_updated','create_necessary_webhooks');
+register_activation_hook( MRC_PLUGIN_FILE, 'create_necessary_webhooks' );
 
 function create_necessary_webhooks() {
   $main_url = "https://edwardk66.sg-host.com/?mailchimp_generate_coupon_list=";
