@@ -62,4 +62,8 @@ class Mailchimp_API {
     }
     return $response;
   }
+  public function delete_subscribe_webhook($listid, $webhookid) {
+    $response = $this->client->lists->deleteListWebhook($listid, $webhookid);
+    return $response;
+  }
 }
