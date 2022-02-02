@@ -12,15 +12,20 @@ class Mailchimp_API {
   public function __construct() {
     $mailchimp_options = get_option('mrc_options');
     $this->apikey = $mailchimp_options['mrc_field_apikey'];
-    $this->client = new MailchimpMarketing\ApiClient();
-    $this->client->setConfig([
-      'apiKey' => $this->apikey,
-      'server' => substr($this->apikey,strpos($this->apikey,'-')+1),
-    ]);
+    if ($this->apikey) {
+      $this->client = new MailchimpMarketing\ApiClient();
+      $this->client->setConfig([
+        'apiKey' => $this->apikey,
+        'server' => substr($this->apikey,strpos($this->apikey,'-')+1),
+      ]);
+    }
   }
   public function get_lists() {
-    $response = $this->client->lists->getAllLists();
-    return $response->lists;
+    if ($this->apikey) {
+      $response = $this->client->lists->getAllLists();
+      return $response->lists;
+    }
+    return array();
   }
   public function get_list_webhooks($listid) {
     $list_webhooks = $this->client->lists->getListWebhooks($listid);
