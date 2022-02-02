@@ -48,9 +48,11 @@ add_action('init','handle_webhook_response');
 
 function handle_webhook_response() {
 	if (isset($_GET['mailchimp_generate_coupon_list']) && !empty($_GET['mailchimp_generate_coupon_list'])) {
+		$mrc_options = get_option('mrc_options');
+		$coupon_amount = $mrc_options['list_'.$_GET['mailchimp_generate_coupon_list']];
 		$event_type = $_POST['type'];
-		if ($event_type === 'subscribe') {
-
+		if ($event_type === 'subscribe' && $coupon_amount) {
+			create_random_coupon($coupon_amount);
 		}
 	}
 }
