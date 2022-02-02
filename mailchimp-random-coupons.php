@@ -21,3 +21,25 @@ function MRC_API() {
 }
 
 $GLOBALS['mailchimp_api'] = MRC_API();
+
+add_action('mailchimp_coupons_settings_updated','create_necessary_webhooks');
+register_activation_hook( MRC_PLUGIN_FILE, 'create_necessary_webhooks' );
+
+function create_necessary_webhooks() {
+  $main_url = "https://edwardk66.sg-host.com/?mailchimp_generate_coupon_list=";
+  $lists = MRC_API()->get_lists();
+  $mrc_options = get_option('mrc_options');
+  foreach ($lists as $list) {
+    $url = $main_url . $list->id;
+    if ($mrc_options['list_'.$list->id]) {
+      MRC_API()->create_subscribe_webhook($list->id,$url);
+    } else {
+      $webhooks = MRC_API()->get_list_webhooks($list->id);
+      foreach($webhooks as $webhook) {
+        if ($webhook->url === $url) {
+          MRC_API()->delete_subscribe_webhook($list->id,$webhook->id);
+        }
+      }
+    }
+  }
+}
