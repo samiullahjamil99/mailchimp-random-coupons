@@ -21,9 +21,3 @@ function MRC_API() {
 }
 
 $GLOBALS['mailchimp_api'] = MRC_API();
-
-register_activation_hook( MRC_PLUGIN_FILE, 'mrc_activate' );
-
-function mrc_activate() {
-
-}
