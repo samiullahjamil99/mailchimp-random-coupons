@@ -35,4 +35,31 @@ class Mailchimp_API {
     }
     return $webhooks;
   }
+  public function create_subscribe_webhook($listid, $url) {
+    $webhooks = $this->get_list_webhooks($listid);
+    $webhook_found = false;
+    foreach($webhooks as $webhook) {
+      if ($webhook->url === $url)
+        $webhook_found = true;
+    }
+    if (!$webhook_found) {
+      $response = $this->client->lists->createListWebhook($listid,array(
+        'url' => $url,
+        'events' => array(
+          'subscribe' => true,
+          'unsubscribe' => false,
+          'profile' => false,
+          'upmail' => false,
+        ),
+        'sources' => array(
+          'user' => true,
+          'admin' => true,
+          'api' => false,
+        ),
+      ));
+    } else {
+      $response = false;
+    }
+    return $response;
+  }
 }
