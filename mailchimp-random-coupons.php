@@ -43,3 +43,14 @@ function create_necessary_webhooks() {
     }
   }
 }
+
+add_action('init','handle_webhook_response');
+
+function handle_webhook_response() {
+	if (isset($_GET['mailchimp_generate_coupon_list']) && !empty($_GET['mailchimp_generate_coupon_list'])) {
+		$event_type = $_POST['type'];
+		if ($event_type === 'subscribe') {
+			
+		}
+	}
+}
