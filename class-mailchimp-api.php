@@ -71,4 +71,12 @@ class Mailchimp_API {
     $response = $this->client->lists->deleteListWebhook($listid, $webhookid);
     return $response;
   }
+  public function add_member_coupon_data($listid,$email,$coupon) {
+    $response = $this->client->lists->setListMember($listid, md5(strtolower($email)), [
+      'merge_fields' => [
+        'COUPON' => $coupon,
+      ],
+    ]);
+    return $response;
+  }
 }
