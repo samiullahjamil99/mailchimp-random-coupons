@@ -48,11 +48,14 @@ add_action('init','handle_webhook_response');
 
 function handle_webhook_response() {
 	if (isset($_GET['mailchimp_generate_coupon_list']) && !empty($_GET['mailchimp_generate_coupon_list'])) {
+		$listid = $_GET['mailchimp_generate_coupon_list'];
 		$mrc_options = get_option('mrc_options');
-		$coupon_amount = $mrc_options['list_'.$_GET['mailchimp_generate_coupon_list']];
+		$coupon_amount = $mrc_options['list_'.$listid];
 		$event_type = $_POST['type'];
+		$member_email = $_POST['data']['email'];
 		if ($event_type === 'subscribe' && $coupon_amount) {
-			create_random_coupon($coupon_amount);
+			$couponcode = create_random_coupon($coupon_amount);
+			MRC_API()->add_member_coupon_data($listid,$member_email,$couponcode);
 		}
 	}
 }
@@ -70,7 +73,6 @@ function create_random_coupon($list_amount) {
 			$i--;
 		}
 	}
-	//echo $res;
 	if ($res) {
 		$coupon_code = $res; // Code
 		$amount = $list_amount; // Amount
@@ -95,5 +97,8 @@ function create_random_coupon($list_amount) {
 		update_post_meta( $new_coupon_id, 'expiry_date', date("Y-m-d",strtotime('+30 days')) );
 		update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
 		update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+
+		return $res;
 	}
+	return false;
 }
