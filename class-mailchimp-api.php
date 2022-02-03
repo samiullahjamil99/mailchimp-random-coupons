@@ -59,7 +59,7 @@ class Mailchimp_API {
         'sources' => array(
           'user' => true,
           'admin' => true,
-          'api' => false,
+          'api' => true,
         ),
       ));
     } else {
