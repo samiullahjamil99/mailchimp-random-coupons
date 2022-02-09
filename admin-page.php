@@ -1,7 +1,10 @@
 <?php
 function mrc_settings_init() {
     // Register a new setting for "wporg" page.
-    register_setting( 'mrc', 'mrc_options' );
+    register_setting( 'mrc', 'mrc_options', array(
+      'type' => 'array',
+      'sanitize_callback' => 'verify_mrc_values',
+    ) );
 
     // Register a new section in the "wporg" page.
     add_settings_section(
@@ -40,6 +43,17 @@ function mrc_settings_init() {
 
 add_action( 'admin_init', 'mrc_settings_init' );
 
+function verify_mrc_values($input) {
+  $options = get_option('mrc_options');
+  $output = $input;
+  if ($input['mrc_field_apikey'][0] === '*') {
+    $output['mrc_field_apikey'] = $options['mrc_field_apikey'];
+  } else {
+    do_action('mailchimp_coupons_settings_updated');
+  }
+  return $output;
+}
+
 function mrc_section_mailchimp_callback( $args ) {
     ?>
     <p id="<?php echo esc_attr( $args['id'] ); ?>"><?php esc_html_e( 'Enter your mailchimp API key.', 'mrc' ); ?></p>
@@ -49,8 +63,14 @@ function mrc_section_mailchimp_callback( $args ) {
 function mrc_field_apikey_cb( $args ) {
     // Get the value of the setting we've registered with register_setting()
     $options = get_option( 'mrc_options' );
+    $saved_apikey = $options[$args['label_for']];
+    $hidden_apikey = $saved_apikey;
+    //$saved_apikey_char_array = str_split($saved_apikey);
+    for($i = 0; $i < strlen($saved_apikey) - 18; $i++) {
+      $hidden_apikey[$i] = '*';
+    }
     ?>
-    <input type="password" id="<?php echo esc_attr( $args['label_for'] ); ?>" name="mrc_options[<?php echo esc_attr( $args['label_for'] ); ?>]" value="<?php echo $options[$args['label_for']]; ?>">
+    <input type="text" id="<?php echo esc_attr( $args['label_for'] ); ?>" name="mrc_options[<?php echo esc_attr( $args['label_for'] ); ?>]" value="<?php echo $hidden_apikey; ?>" style="width:320px;">
     <?php
 }
 
@@ -82,7 +102,6 @@ function mailchimp_coupons_settings_page_html() {
     if ( isset( $_GET['settings-updated'] ) ) {
         // add settings saved message with the class of "updated"
         add_settings_error( 'mrc_messages', 'mrc_message', __( 'Settings Saved', 'mrc' ), 'updated' );
-        do_action('mailchimp_coupons_settings_updated');
     }
 
     // show error/update messages
