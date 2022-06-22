@@ -9,4 +9,6 @@ I have created a public repository for this plugin on #github. The link is https
 
 I would love to have contributors for the plugin. Keep in mind that, this plugin is #opensource.
 
+Before developing you need to make sure to install the composer dependencies as they are not the part of the repository and needed to be installed separately. In order to do that use "composer install" in main plugin directory on terminal to install the dependencies.
+
 Thank you.
